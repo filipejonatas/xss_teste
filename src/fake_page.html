@@ -1,200 +1,297 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPS - Login</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="Generator" content="CPS Login">
+  <meta name="Description" content="Login">
+  <title>CPS - Login</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      opacity: 1;
+      min-height: 100vh;
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            min-height: 100vh;
-        }
+    .Form {
+      margin: 0;
+      padding: 0;
+    }
 
-        .header {
-            background-color: #c41e3a;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-        }
+    .Table {
+      border-collapse: collapse;
+      margin: 0;
+      padding: 0;
+    }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-        }
+    .TextBlock {
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      color: #4169E1;
+    }
 
-        .logo img {
-            height: 40px;
-            width: auto;
-            margin-right: 10px;
-        }
+    .Attribute {
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      padding: 4px;
+      border: 1px solid #cccccc;
+    }
 
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 80px 20px;
-            min-height: calc(100vh - 60px);
-        }
+    .Button {
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      padding: 6px 12px;
+      background-color: #4169E1;
+      color: white;
+      border: 1px solid #4169E1;
+      cursor: pointer;
+    }
 
-        .login-form {
-            background: transparent;
-            padding: 0;
-            border-radius: 0;
-            box-shadow: none;
-            width: 100%;
-            max-width: 400px;
-            margin-right: 100px;
-        }
+    .Button:hover {
+      background-color: #3557c7;
+    }
 
-        .form-group {
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+    .ReadonlyAttribute {
+      font-family: 'Calibri';
+      font-size: 40.0pt;
+      font-weight: normal;
+      color: #4169E1;
+    }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 0;
-            color: #4285f4;
-            font-size: 14px;
-            width: 80px;
-            text-align: left;
-        }
+    .BorderGray {
+      border: 1px solid #cccccc;
+    }
 
-        .form-group input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #4285f4;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #4285f4;
-        }
-
-        .btn-entrar {
-            background-color: #4285f4;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-
-        .btn-entrar:hover {
-            background-color: #3367d6;
-        }
-
-        .help-link {
-            color: #4285f4;
-            text-decoration: underline;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .help-link:hover {
-            color: #3367d6;
-        }
-
-        .tentativas-counter {
-            background: white;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            width: 120px;
-            height: 100px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .tentativas-number {
-            font-size: 48px;
-            color: #4285f4;
-            font-weight: bold;
-            line-height: 1;
-        }
-
-        .tentativas-text {
-            font-size: 12px;
-            color: #4285f4;
-            margin-top: 5px;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .login-form {
-                margin-right: 0;
-                margin-bottom: 30px;
-            }
-        }
-    </style>
+    .Image {
+      border: 0;
+    }
+  </style>
 </head>
+<body align="center" class="Form">
+  <form id="MAINFORM" name="MAINFORM" method="post" action="/login" class="Form">
+    <table id="TABLE_MASTER_MPAGE" class="Table" cellpadding="0" cellspacing="0" style="height: 100vh; width: 100%;">
+      <tbody>
+        <!-- Header Row -->
+        <tr>
+          <td colspan="2" style="height:30px">
+            <table id="TOPTABLE_MPAGE" class="Table" cellpadding="0" cellspacing="0" style="background-color: #A3130D; height: 60px; width: 100%;">
+              <tbody>
+                <tr>
+                  <td style="text-align:-webkit-center;width:26px">&nbsp;&nbsp;</td>
+                  <td style="width:43px">
+                    <img src="/assets/cps_logo.png" alt="CPS Logo" style="height: 40px; width: auto;">
+                  </td>
+                  <td style="width:69px">&nbsp;</td>
+                  <td></td>
+                  <td style="text-align:-webkit-right"></td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
 
-<body>
-    <div class="header">
-        <div class="logo">
-            <img src="/assets/cps_logo.png" alt="CPS Logo">
-        </div>
-    </div>
+        <!-- Spacer Row -->
+        <tr>
+          <td valign="top" colspan="2" style="height:10px">&nbsp;</td>
+        </tr>
 
-    <div class="container">
-        <div class="login-form">
-            <form action="/login" method="POST">
-                <div class="form-group">
-                    <label for="usuario">Usuário</label>
-                    <input type="text" id="usuario" name="usuario" required>
-                </div>
+        <!-- Main Content Row -->
+        <tr>
+          <td valign="top" colspan="2" style="text-align:-webkit-left">
+            <table id="TABLE_MID_MPAGE" class="Table" cellpadding="0" cellspacing="0" style="width: 100%;">
+              <tbody>
+                <tr>
+                  <td valign="top" style="width:150px"></td>
+                  <td valign="top">
+                    <table id="TABLE3" class="Table" cellpadding="1" cellspacing="2">
+                      <tbody>
+                        <tr>
+                          <td valign="top" rowspan="2" style="width:50px"></td>
+                          <td style="height:50px"></td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <table id="TABLE4" cellpadding="1" cellspacing="2">
+                              <tbody>
+                                <!-- Login Form Content -->
+                                <tr valign="top">
+                                  <td style="width:70px"></td>
+                                  <td style="width:550px"></td>
+                                  <td valign="top" rowspan="12">
+                                    <p></p>
+                                    <p></p>
+                                    <p></p>
+                                    <p></p>
+                                    <!-- Tentativas Counter -->
+                                    <table id="TABLE1" class="BorderGray" cellpadding="1" cellspacing="2" style="width: 80px;">
+                                      <tbody>
+                                        <tr>
+                                          <td style="text-align:-webkit-center">
+                                            <span class="ReadonlyAttribute" id="span_vTENTATIVAS">{{tentativas}}</span><br>
+                                            <span class="TextBlock" style="color:#4169E1;font-family:'Calibri'; font-size:9.0pt;" id="TEXTBLOCK5">tentativas</span>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </td>
+                                </tr>
 
-                <div class="form-group">
-                    <label for="senha">Senha</label>
-                    <input type="password" id="senha" name="senha" required>
-                </div>
+                                <!-- Spacer -->
+                                <tr>
+                                  <td></td>
+                                  <td style="height:30px"></td>
+                                  <td></td>
+                                </tr>
 
-                <button type="submit" class="btn-entrar">Entrar</button>
+                                <!-- Microsoft Login Button (hidden) -->
+                                <tr>
+                                  <td></td>
+                                  <td valign="top" style="text-align:-webkit-center">
+                                    <table id="TABLE5" align="center" class="Table" cellpadding="1" cellspacing="2">
+                                      <tbody>
+                                        <tr>
+                                          <td></td>
+                                          <td valign="top" style="text-align:-webkit-center">
+                                            <!-- Microsoft login button would go here if needed -->
+                                          </td>
+                                          <td></td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </td>
+                                  <td></td>
+                                </tr>
 
-                {{error_message}}
+                                <!-- Spacer -->
+                                <tr>
+                                  <td style="height:30px"></td>
+                                  <td style="height:30px"></td>
+                                  <td></td>
+                                </tr>
 
-                <div>
-                    <a href="/help" class="help-link">Soluções para problemas no Acesso</a>
-                </div>
-            </form>
-        </div>
+                                <!-- Usuario Field -->
+                                <tr>
+                                  <td style="height:38px">
+                                    <span class="TextBlock" id="TEXTBLOCK1">Usuário</span>
+                                  </td>
+                                  <td>
+                                    <input type="text" id="vSIS_USUARIOID" name="usuario" value="" size="20" title="usuario" maxlength="20" class="Attribute" style="height: 1row;text-align:left" required>
+                                  </td>
+                                  <td></td>
+                                </tr>
 
-        <div class="tentativas-counter">
-            <div class="tentativas-number">{{tentativas}}</div>
-            <div class="tentativas-text">tentativas</div>
-        </div>
-    </div>
-    <script>
-        setTimeout(() => {
-            window.location.href = 'https://siga.cps.sp.gov.br/fatec/login.aspx'
-        }, 10000); 
-    </script>
+                                <!-- Senha Field -->
+                                <tr>
+                                  <td>
+                                    <span class="TextBlock" id="TEXTBLOCK2">Senha</span>
+                                  </td>
+                                  <td>
+                                    <input type="password" id="vSIS_USUARIOSENHA" name="senha" value="" size="32" title="senha" maxlength="32" class="Attribute" style="height: 1row;text-align:left" required>
+                                  </td>
+                                </tr>
+
+                                <!-- Spacer -->
+                                <tr>
+                                  <td></td>
+                                  <td style="height:30px"></td>
+                                </tr>
+
+                                <!-- Entrar Button -->
+                                <tr>
+                                  <td></td>
+                                  <td>
+                                    <input type="submit" name="BTCONFIRMA" value="Entrar" title="Entrar" class="Button">
+                                    <div>
+                                      <span class="ErrorViewer" id="gxErrorViewer">{{error_message}}</span>
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <!-- Alert Message (hidden) -->
+                                <tr>
+                                  <td></td>
+                                  <td>
+                                    <div class="textblock" style="display:none;" id="ALERTA">alerta</div>
+                                  </td>
+                                </tr>
+
+                                <!-- Profile Selection (hidden) -->
+                                <tr>
+                                  <td></td>
+                                  <td>
+                                    <span class="TextBlock" style="display:none;" id="TEXTBLOCK3">Perfil de Ingresso:</span>
+                                  </td>
+                                </tr>
+
+                                <!-- Profile Dropdown (hidden) -->
+                                <tr>
+                                  <td></td>
+                                  <td style="text-align:-webkit-right">
+                                    <select id="vFILTRO_SIS_GRUPOID" name="vFILTRO_SIS_GRUPOID" class="Attribute" style="width: 50chr;display:none;">
+                                      <!-- Profile options would go here -->
+                                    </select>
+                                  </td>
+                                </tr>
+
+                                <!-- Grid Container (hidden) -->
+                                <tr>
+                                  <td></td>
+                                  <td>
+                                    <div id="Grid1ContainerDiv" style="display:none;">
+                                      <!-- Grid content would go here -->
+                                    </div>
+                                  </td>
+                                </tr>
+
+                                <!-- Additional Table (hidden) -->
+                                <tr>
+                                  <td></td>
+                                  <td>
+                                    <table id="TABLE2" class="Table" cellpadding="1" cellspacing="2" style="display:none;background-color: #F08080;">
+                                      <!-- Additional content would go here -->
+                                    </table>
+                                  </td>
+                                </tr>
+
+                                <!-- Help Link -->
+                                <tr>
+                                  <td></td>
+                                  <td>
+                                    <span class="TextBlock" style="color:#4169E1;" id="TEXTBLOCK4">
+                                      <a href="/help" style="color:#4169E1; text-decoration: underline;">Soluções para problemas no Acesso</a>
+                                    </span>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Bottom Spacer -->
+        <tr>
+          <td valign="bottom" colspan="2" style="text-align:-webkit-center"></td>
+        </tr>
+        <tr>
+          <td colspan="2" style="height:10px">&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+
+  <script>
+    setTimeout(() => {
+      window.location.href = 'https://siga.cps.sp.gov.br/fatec/login.aspx'
+    }, 10000);
+  </script>
 </body>
-
 </html>
