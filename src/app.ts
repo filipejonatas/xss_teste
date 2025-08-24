@@ -106,8 +106,5 @@ app.listen(PORT, (): void => {
     const url = `http://localhost:${PORT}`;
     console.log(`Servidor rodando em ${url}`);
     console.log('Iniciando com XSS page, que redirecionará para fake page e depois para link externo...');
-
-    // Automatically open browser
-    console.log('Abrindo navegador...');
-    openBrowser(url);
+    
 });
