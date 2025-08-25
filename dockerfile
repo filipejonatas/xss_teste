@@ -1,32 +1,37 @@
-# --- Base build stage ---
-FROM node:20-alpine AS build
+# Etapa 1: build
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Install deps first (better caching)
-COPY package*.json ./
+# Instala dependências primeiro (para cache eficiente)
+COPY package*.json tsconfig.json ./
 RUN npm ci
 
-# Copy tsconfig and the rest of the source
-COPY tsconfig.json ./tsconfig.json
+# Copia o código e assets
 COPY . .
 
-# Build TypeScript -> dist
+# Compila TypeScript
 RUN npm run build
 
-# --- Runtime stage ---
+# Copia arquivos estáticos para a pasta de saída, caso necessário
+# (ajuste os caminhos se forem diferentes)
+RUN mkdir -p dist/public && \
+    if [ -d "public" ]; then cp -r public/* dist/public/ || true; fi
+
+# Etapa 2: runtime
 FROM node:20-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
+ENV PORT=3000
 
-# Copy only package files and install prod deps
-COPY package*.json ./ 
+# Apenas dependências de produção
+COPY package*.json ./
 RUN npm ci --omit=dev
 
-# Copy built app and static assets from build stage
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/public ./public
-# assets folder is optional; copy only if it exists
-COPY --from=build /app/assets ./assets
+# Copia build e public (já copiado na etapa anterior para dist/public)
+COPY --from=builder /app/dist ./dist
 
+# Exponha a porta
 EXPOSE 3000
+
+# Comando de start
 CMD ["node", "dist/app.js"]

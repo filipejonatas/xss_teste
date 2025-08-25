@@ -1,15 +1,18 @@
-version: '3.8'
-
+version: "3.9"
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: xss_teste_app
     ports:
       - "3000:3000"
     environment:
+      NODE_ENV: production
+      PORT: 3000
+      # Configure suas variáveis de ambiente do Upstash aqui
       UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL}
       UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN}
-    command: ["node", "dist/app.js"]   # <<< executa o compilado
-    # Para DEV, descomente os volumes abaixo (hot reload)
-    # volumes:
-    #   - .:/usr/src/app
-    #   - /usr/src/app/node_modules
+    # Se você quiser recarregar em dev, pode montar volumes e usar ts-node-dev,
+    # mas para produção mantenha só o build.
+    restart: unless-stopped
