@@ -1,25 +1,12 @@
 {
   "compilerOptions": {
-    /* Language and Environment */
     "target": "es2016",
-
-    /* Modules */
     "module": "commonjs",
-
-    /* Emit */
-    "outDir": "dist",             // ADD: compile output goes to ./dist
-    "rootDir": ".",               // ADD: app.ts is at project root
-
-    /* Interop Constraints */
+    "outDir": "./dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-
-    /* Type Checking */
     "strict": true,
-
-    /* Completeness */
     "skipLibCheck": true
   },
-  "include": ["app.ts"],          // ADD: compile just your entry file
-  "exclude": ["node_modules", "dist"]
+  "include": ["*.ts"] 
 }

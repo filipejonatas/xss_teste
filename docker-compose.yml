@@ -1,13 +1,15 @@
-version: "3.9"
+version: '3.8'
+
 services:
-  web:
+  app:
     build: .
-    container_name: xss_teste_web
     ports:
       - "3000:3000"
     environment:
-      # Local testing: forward your env vars to the container
       UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL}
       UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN}
-      NODE_ENV: production
-      PORT: 3000
+    command: ["node", "dist/app.js"]   # <<< executa o compilado
+    # Para DEV, descomente os volumes abaixo (hot reload)
+    # volumes:
+    #   - .:/usr/src/app
+    #   - /usr/src/app/node_modules
